@@ -32,7 +32,7 @@ function auth(req, res, next){
 }
 
 function allowOrigin(){
-    respponse.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', '*');
 }
 var data = {};
 
