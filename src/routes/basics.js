@@ -31,9 +31,6 @@ function auth(req, res, next){
     }
 }
 
-function allowOrigin(){
-    res.setHeader('Access-Control-Allow-Origin', '*');
-}
 var data = {};
 
 
@@ -52,7 +49,7 @@ const tipoDespesa={
     }
 }
 
-basics.get("/", auth, allowOrigin, async (request, response)=>{
+basics.get("/", auth,  async (request, response)=>{
     const { mes } = request.query;
     //console.log("mes", mes);
     
@@ -124,7 +121,7 @@ basics.get("/", auth, allowOrigin, async (request, response)=>{
     
 })
 
-basics.get("/:bloco", allowOrigin, (request, response)=>{
+basics.get("/:bloco", (request, response)=>{
 
     let { bloco } = request.params;
 
@@ -132,7 +129,7 @@ basics.get("/:bloco", allowOrigin, (request, response)=>{
     response.json(bl)
 })
 
-basics.post("/", auth, allowOrigin, (request, response) =>{
+basics.post("/", auth, (request, response) =>{
     let { bloco, nome, valor, mes } = request.body;
 
     var includeObj = {
@@ -169,7 +166,7 @@ basics.post("/", auth, allowOrigin, (request, response) =>{
    
 })
 
-basics.put("/:id",allowOrigin, (request, response)=>{
+basics.put("/:id", (request, response)=>{
     const { nome, valor, mes } = request.body;
     const { id } = request.params;
     var responseObj = {};
@@ -206,7 +203,7 @@ basics.put("/:id",allowOrigin, (request, response)=>{
 
     });
 
-basics.delete("/:id", auth, allowOrigin,(request, response)=>{
+basics.delete("/:id", auth, (request, response)=>{
     const { id } = request.params;
     var responseObj = {};
     pool.getConnection((err, connection) => {
