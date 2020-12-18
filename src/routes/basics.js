@@ -131,6 +131,7 @@ basics.get("/:bloco", (request, response)=>{
 })
 
 basics.post("/", auth, (request, response) =>{
+    response.header("Access-Control-Allow-Origin", "*");
     let { bloco, nome, valor, mes } = request.body;
 
     var includeObj = {
@@ -205,6 +206,7 @@ basics.put("/:id", (request, response)=>{
     });
 
 basics.delete("/:id", auth, (request, response)=>{
+    response.header("Access-Control-Allow-Origin", "*");
     const { id } = request.params;
     var responseObj = {};
     pool.getConnection((err, connection) => {
