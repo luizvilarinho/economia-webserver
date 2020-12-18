@@ -19,7 +19,7 @@ const cors = require("cors");
 
 
 //app.use(cors());
-app.use(cors({origin: 'http://www.luizvilarinho.com.br'}));
+app.use(cors({origin: '*'}));
 app.use(express.json());
 app.use(bodyParser.json());
 

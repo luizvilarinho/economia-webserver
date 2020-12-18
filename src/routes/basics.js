@@ -50,6 +50,7 @@ const tipoDespesa={
 }
 
 basics.get("/", auth,  async (request, response)=>{
+    res.header("Access-Control-Allow-Origin", "*");
     const { mes } = request.query;
     //console.log("mes", mes);
     
