@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 //const data = require("../data/data");
 const somarValores = require("../modules/somarValores");
 const monthFilter = require("../modules/monthFilter");
+const auth = require('../modules/auth');
 
 const mysql = require("mysql");
 
@@ -16,25 +17,6 @@ const pool = mysql.createPool({
 });
 
 var user_id = 0;
-
-function auth(req, res, next){
-    //const token = req.header('x-auth-token');
-    const token = req.cookies['eco-user-token'];
-    
-    console.log("req.cookies", req.cookies)
-    console.log("token", token);
-    
-    if(!token) res.status(401).send('access denied. No token provided.');
-
-    try{
-        user_id = jwt.verify(token, "mysecret").id;
-        //req.user_id = decoded;
-        next();
-    }
-    catch(ex){
-        res.status(400).send("Invalid token");
-    }
-}
 
 var data = {};
 
@@ -54,7 +36,7 @@ const tipoDespesa={
     }
 }
 
-basics.get("/getcookie", async(req, res)=>{
+basics.get("/getcookie", auth, async(req, res)=>{
     var responseObj = {
         cookies:req.cookies,
         userID:user_id
