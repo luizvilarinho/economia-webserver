@@ -43,7 +43,8 @@ basics.get("/getcookie", auth, async(req, res)=>{
 })
 
 basics.get("/", auth,  async (request, response)=>{
-   0
+    response.header("Access-Control-Allow-Origin", "*");
+    response.header('Access-Control-Allow-Credentials', true)
     const { mes } = request.query;
     //console.log("mes", mes);
     
@@ -199,6 +200,8 @@ basics.put("/:id", (request, response)=>{
 
 basics.delete("/:id", auth, (request, response)=>{
     response.header("Access-Control-Allow-Origin", "*");
+    response.header('Access-Control-Allow-Credentials', true)
+
     const { id } = request.params;
     var responseObj = {};
     pool.getConnection((err, connection) => {
