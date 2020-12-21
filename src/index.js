@@ -22,9 +22,9 @@ const cors = require("cors");
 var SECRET = "mysecret";
 
 var corsOptions = {
-  origin: 'https://luizvilarinho.com.br/economia',
+  origin: '*',
   optionsSuccessStatus: 200, // For legacy browser support
-  methods: "GET, , POST, PUT"
+  methods: "GET, POST, PUT"
 }
 
 app.use(cors(corsOptions));
