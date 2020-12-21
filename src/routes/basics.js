@@ -198,6 +198,7 @@ basics.put("/:id", (request, response)=>{
     });
 
 basics.delete("/:id", auth, (request, response)=>{
+    response.header("Access-Control-Allow-Origin", "*");
     const { id } = request.params;
     var responseObj = {};
     pool.getConnection((err, connection) => {
