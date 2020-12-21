@@ -24,7 +24,7 @@ var SECRET = "mysecret";
 var corsOptions = {
   origin: 'https://luizvilarinho.com.br/economia',
   optionsSuccessStatus: 200, // For legacy browser support
-  methods: "GET, PUT"
+  methods: "GET, , POST, PUT"
 }
 
 app.use(cors(corsOptions));
