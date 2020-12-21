@@ -54,6 +54,14 @@ const tipoDespesa={
     }
 }
 
+basics.get("/getcookie", auth, async(req, res)=>{
+    var responseObj = {
+        cookies:req.cookies,
+        userID:user_id
+    }
+    res.json(responseObj);
+})
+
 basics.get("/", auth,  async (request, response)=>{
     response.header("Access-Control-Allow-Origin", "*");
     const { mes } = request.query;
