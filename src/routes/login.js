@@ -61,7 +61,7 @@ login.post("/user/login", (request, response) =>{
                     email:user[0].email,
                     user_id:user[0].id,
                     auth:true,
-                    token:config.token,
+                    token:request.session.ecoUserToken,
                     message:"usuário encontrado",
                     cookies:request.cookies
                 }

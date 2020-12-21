@@ -21,10 +21,19 @@ const cors = require("cors");
 
 var SECRET = "mysecret";
 
+function setHeaders(req, res, next) {
+
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Headers", "X-Requested-With");
+  res.setHeader("Access-Control-Allow-Credentials", true);
+  next();
+};
+
 //app.use(cors());
 app.use(cookieParser())
 app.use(cors({origin: '*'}));
 app.use(express.json());
+app.use(setHeaders())
 
 app.use(session({
   secret: SECRET,
