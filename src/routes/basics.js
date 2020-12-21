@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const somarValores = require("../modules/somarValores");
 const monthFilter = require("../modules/monthFilter");
 const auth = require('../modules/auth');
+const config = require('../config');
 
 const mysql = require("mysql");
 
@@ -15,8 +16,6 @@ const pool = mysql.createPool({
     database : 'u575119774_economia',
     connectionLimit: 10
 });
-
-var user_id = 0;
 
 var data = {};
 
@@ -51,11 +50,11 @@ basics.get("/", auth,  async (request, response)=>{
     
     /**get data from table*/
     
-    console.log("USERID", user_id)
+    console.log("USERID", config.user_id)
      pool.getConnection(async (err, connection) => {
         if(err) throw err;
         
-        let queryDespesasFixas = `SELECT * FROM eco_data WHERE id_despesa = 1 and user_id = ${user_id}`;
+        let queryDespesasFixas = `SELECT * FROM eco_data WHERE id_despesa = 1 and user_id = ${config.user_id}`;
 
         connection.query(queryDespesasFixas, (error, result)=> {
             if (error) throw error;
@@ -67,7 +66,7 @@ basics.get("/", auth,  async (request, response)=>{
             
         });
 
-        let queryDespesasVariaveis = `SELECT * FROM eco_data WHERE id_despesa = 2 and user_id = ${user_id}`;
+        let queryDespesasVariaveis = `SELECT * FROM eco_data WHERE id_despesa = 2 and user_id = ${config.user_id}`;
 
         connection.query(queryDespesasVariaveis, (error, result)=> {
             if (error) throw error;
@@ -79,7 +78,7 @@ basics.get("/", auth,  async (request, response)=>{
         
         });
 
-         let queryEntradas = `SELECT * FROM eco_data WHERE id_despesa = 3 and user_id = ${user_id}`;
+         let queryEntradas = `SELECT * FROM eco_data WHERE id_despesa = 3 and user_id = ${config.user_id}`;
 
          connection.query(queryEntradas, (error, result)=> {
             if (error) throw error;
@@ -207,7 +206,7 @@ basics.delete("/:id", auth, (request, response)=>{
     pool.getConnection((err, connection) => {
         if(err) throw err;
         
-        let deleteitem = `DELETE FROM eco_data WHERE user_id = ${user_id} and id = ${id}`;
+        let deleteitem = `DELETE FROM eco_data WHERE user_id = ${config.user_id} and id = ${id}`;
 
         connection.query(deleteitem, (error, result)=> {
             if (error) throw error;

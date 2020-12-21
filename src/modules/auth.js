@@ -8,16 +8,21 @@ app.use(cookieParser())
 
 var environment = 'prod';
 
+var SECRET = "mysecret";
+
 function auth(req, res, next){
     const authResponse = {};
     const token = config.token;
 
+    console.log("config.token", config.token);
+
     authResponse.message = 'access denied. No token provided.';
     authResponse.redirect = config[environment].urlLogin;
+
     if(!token) res.json(authResponse);
 
     try{
-        user_id = jwt.verify(token, "mysecret").id;
+        config.user_id = jwt.verify(token, SECRET).id;
         //req.user_id = decoded;
         next();
     }

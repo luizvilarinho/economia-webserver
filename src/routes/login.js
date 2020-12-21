@@ -1,6 +1,7 @@
 const express = require("express");
 const login = express.Router();
 
+const config = require('../config');
 const jwt = require("jsonwebtoken");
 
 const mysql = require("mysql");
@@ -57,7 +58,7 @@ login.post("/user/login", (request, response) =>{
                     email:user[0].email,
                     user_id:user[0].id,
                     auth:true,
-                    token:token,
+                    token:config.token,
                     message:"usuário encontrado",
                     cookies:request.cookies
                 }
