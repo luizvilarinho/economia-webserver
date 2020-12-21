@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const cookieParser = require("cookie-parser");
 
 const mysql = require("mysql");
 
@@ -19,8 +20,10 @@ const cors = require("cors");
 
 
 //app.use(cors());
+app.use(cookieParser())
 app.use(cors({origin: '*'}));
 app.use(express.json());
+
 app.use(bodyParser.json());
 
 

@@ -18,7 +18,12 @@ const pool = mysql.createPool({
 var user_id = 0;
 
 function auth(req, res, next){
-    const token = req.header('x-auth-token');
+    //const token = req.header('x-auth-token');
+    const token = req.cookies['eco-user-token'];
+    
+    console.log("req.cookies", req.cookies)
+    console.log("token", token);
+    
     if(!token) res.status(401).send('access denied. No token provided.');
 
     try{
