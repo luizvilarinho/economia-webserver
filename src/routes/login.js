@@ -46,8 +46,9 @@ login.post("/user/login", (request, response) =>{
                 const token = jwt.sign({id:user[0].id}, SECRET, {
                     expiresIn:"30d"
                 });
-                response.cookie('eco-user-token', token, { maxAge: 900000, httpOnly: true, path: '/' });
 
+                response.cookie('eco-user-token', token, { maxAge: 900000, httpOnly: true });
+                
                 objRespopnse = {
                     success : true,
                     findUser: true,
