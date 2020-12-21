@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 app.use(cookieParser())
 
-var environment = 'dev';
+var environment = 'prod';
 
 function auth(req, res, next){
     const authResponse = {};
