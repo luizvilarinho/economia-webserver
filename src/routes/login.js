@@ -43,12 +43,12 @@ login.post("/user/login", (request, response) =>{
             
             if(user[0].password === password){
 
-                const token = jwt.sign({id:user[0].id}, SECRET, {
+                config.token = jwt.sign({id:user[0].id}, SECRET, {
                     expiresIn:"30d"
                 });
 
-                response.cookie('eco-user-token', token, { maxAge: 900000, httpOnly: true });
-                
+                //response.cookie('eco-user-token', token, { maxAge: 900000, httpOnly: true });
+
                 objRespopnse = {
                     success : true,
                     findUser: true,

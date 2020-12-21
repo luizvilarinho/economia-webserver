@@ -10,10 +10,7 @@ var environment = 'prod';
 
 function auth(req, res, next){
     const authResponse = {};
-    const token = req.cookies['eco-user-token'];
-    
-    console.log("req.cookies", req.cookies)
-    console.log("token", token);
+    const token = config.token;
 
     authResponse.message = 'access denied. No token provided.';
     authResponse.redirect = config[environment].urlLogin;

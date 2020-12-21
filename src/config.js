@@ -5,7 +5,8 @@ var config = {
     },
     prod:{
         urlLogin:"https://luizvilarinho.com.br/login"
-    }
+    },
+    token:""
 }
 
 module.exports = config;
