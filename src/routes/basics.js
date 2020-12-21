@@ -43,7 +43,7 @@ basics.get("/getcookie", auth, async(req, res)=>{
 })
 
 basics.get("/", auth,  async (request, response)=>{
-    response.header("Access-Control-Allow-Origin", "*");
+   0
     const { mes } = request.query;
     //console.log("mes", mes);
     
@@ -124,7 +124,6 @@ basics.get("/:bloco", (request, response)=>{
 })
 
 basics.post("/", auth, (request, response) =>{
-    response.header("Access-Control-Allow-Origin", "*");
     let { bloco, nome, valor, mes } = request.body;
 
     var includeObj = {
@@ -199,7 +198,6 @@ basics.put("/:id", (request, response)=>{
     });
 
 basics.delete("/:id", auth, (request, response)=>{
-    response.header("Access-Control-Allow-Origin", "*");
     const { id } = request.params;
     var responseObj = {};
     pool.getConnection((err, connection) => {
