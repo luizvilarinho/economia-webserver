@@ -21,7 +21,13 @@ const cors = require("cors");
 
 var SECRET = "mysecret";
 
-app.use(cors());
+var corsOptions = {
+  origin: 'http://luizvilarinho.com.br',
+  optionsSuccessStatus: 200, // For legacy browser support
+  methods: "GET, PUT"
+}
+
+app.use(cors(corsOptions));
 app.use(cookieParser())
 app.use(cors({origin: '*'}));
 app.use(express.json());
