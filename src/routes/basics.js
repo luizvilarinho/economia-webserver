@@ -54,7 +54,7 @@ const tipoDespesa={
     }
 }
 
-basics.get("/getcookie", auth, async(req, res)=>{
+basics.get("/getcookie", async(req, res)=>{
     var responseObj = {
         cookies:req.cookies,
         userID:user_id
