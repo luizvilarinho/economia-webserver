@@ -3,6 +3,7 @@ const app = express();
 const cookieParser = require("cookie-parser");
 
 const mysql = require("mysql");
+var session = require('express-session');
 
 const pool = mysql.createPool({
     host     : 'sql399.main-hosting.eu',
@@ -18,10 +19,18 @@ const login = require("./routes/login");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
+var SECRET = "mysecret";
+
 //app.use(cors());
 app.use(cookieParser())
 app.use(cors({origin: '*'}));
 app.use(express.json());
+
+app.use(session({
+  secret: SECRET,
+  resave: true,
+  saveUninitialized: true
+}));
 
 app.use(bodyParser.json());
 

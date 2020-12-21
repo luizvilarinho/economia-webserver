@@ -12,9 +12,9 @@ var SECRET = "mysecret";
 
 function auth(req, res, next){
     const authResponse = {};
-    const token = config.token;
+    const token = req.session.ecoUserToken;
 
-    console.log("config.token", config.token);
+    console.log("token", token);
 
     authResponse.message = 'access denied. No token provided.';
     authResponse.redirect = config[environment].urlLogin;
@@ -22,7 +22,7 @@ function auth(req, res, next){
     if(!token) res.json(authResponse);
 
     try{
-        config.user_id = jwt.verify(token, SECRET).id;
+        req.session.userId = jwt.verify(token, SECRET).id;
         //req.user_id = decoded;
         next();
     }

@@ -16,10 +16,12 @@ const pool = mysql.createPool({
 
 var SECRET = "mysecret";
 
+
 login.post("/user/login", (request, response) =>{
     const { email, password } = request.body;
     var objRespopnse = {};
 
+   
     let findUserQuery = `SELECT * FROM users WHERE email = '${email}'`;
     
     pool.getConnection((err, connection)=>{
@@ -44,10 +46,11 @@ login.post("/user/login", (request, response) =>{
             
             if(user[0].password === password){
 
-                config.token = jwt.sign({id:user[0].id}, SECRET, {
+               request.session.ecoUserToken = jwt.sign({id:user[0].id}, SECRET, {
                     expiresIn:"30d"
                 });
 
+                console.log("request.session", request.session);
                 //response.cookie('eco-user-token', token, { maxAge: 900000, httpOnly: true });
 
                 objRespopnse = {
