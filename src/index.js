@@ -22,7 +22,7 @@ const cors = require("cors");
 var SECRET = "mysecret";
 
 var corsOptions = {
-  origin: 'http://luizvilarinho.com.br',
+  origin: 'https://luizvilarinho.com.br',
   optionsSuccessStatus: 200, // For legacy browser support
   methods: "GET, PUT"
 }
