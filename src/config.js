@@ -7,7 +7,7 @@ var config = {
         urlLogin:"https://luizvilarinho.com.br/login"
     },
     token:"",
-    user_id:""
+    userId:""
 }
 
 module.exports = config;

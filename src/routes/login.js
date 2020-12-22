@@ -46,12 +46,9 @@ login.post("/user/login", (request, response) =>{
             
             if(user[0].password === password){
 
-               request.session.ecoUserToken = jwt.sign({id:user[0].id}, SECRET, {
-                    expiresIn:"30d"
+               var token = jwt.sign({id:user[0].id}, SECRET, {
+                    expiresIn:"5d"
                 });
-
-                console.log("request.session", request.session);
-                //response.cookie('eco-user-token', token, { maxAge: 900000, httpOnly: true });
 
                 objRespopnse = {
                     success : true,
@@ -61,7 +58,7 @@ login.post("/user/login", (request, response) =>{
                     email:user[0].email,
                     user_id:user[0].id,
                     auth:true,
-                    token:request.session.ecoUserToken,
+                    token,
                     message:"usuário encontrado",
                     cookies:request.cookies
                 }

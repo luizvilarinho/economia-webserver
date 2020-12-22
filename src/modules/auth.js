@@ -1,10 +1,7 @@
 const express = require("express");
-const app = express();
 
 const config = require('../config');
 const jwt = require("jsonwebtoken");
-const cookieParser = require("cookie-parser");
-app.use(cookieParser())
 
 var environment = 'prod';
 
@@ -12,7 +9,7 @@ var SECRET = "mysecret";
 
 function auth(req, res, next){
     const authResponse = {};
-    const token = req.session.ecoUserToken;
+    const token = req.headers['x-access-token'];
 
     console.log("token", token);
 
@@ -22,8 +19,9 @@ function auth(req, res, next){
     if(!token) res.json(authResponse);
 
     try{
-        req.session.userId = jwt.verify(token, SECRET).id;
-        //req.user_id = decoded;
+        config.userId = jwt.verify(token, SECRET).id;
+        console.log("config", config);
+
         next();
     }
     catch(ex){

@@ -1,9 +1,9 @@
 const express = require('express');
 const app = express();
-const cookieParser = require("cookie-parser");
+//const cookieParser = require("cookie-parser");
 
 const mysql = require("mysql");
-var session = require('express-session');
+//var session = require('express-session');
 
 const pool = mysql.createPool({
     host     : 'sql399.main-hosting.eu',
@@ -15,35 +15,26 @@ const pool = mysql.createPool({
 
 const basics = require("./routes/basics");
 const login = require("./routes/login");
-
-const bodyParser = require("body-parser");
 const cors = require("cors");
+const bodyParser = require("body-parser");
 
-var SECRET = "mysecret";
+//app.use(cookieParser())
+app.use(cors());
 
-var corsOptions = {
-  origin: '*',
-  optionsSuccessStatus: 200, // For legacy browser support
-  methods: "GET, POST, PUT"
-}
-
-app.use(cors(corsOptions));
-app.use(cookieParser())
-app.use(cors({origin: '*'}));
 app.use(express.json());
 
-app.use(session({
-  secret: SECRET,
-  resave: true,
-  saveUninitialized: true
-}));
-
 app.use(bodyParser.json());
-
 
 app.use("/api/eco/v1/data", basics);
 app.use("/api/eco/v1/login", login);
 
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "*");
+  res.header('Access-Control-Allow-Credentials', "*");
+  res.header('Access-Control-Expose-Headers', 'x-access-token'); //essta linha habilita o token no header
+  next();
+});
 
 const port = process.env.PORT || 2500;
 

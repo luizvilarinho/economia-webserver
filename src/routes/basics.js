@@ -1,7 +1,7 @@
 const express = require("express");
 const basics = express.Router();
-const jwt = require("jsonwebtoken");
-//const data = require("../data/data");
+
+const config = require('../config');
 const somarValores = require("../modules/somarValores");
 const monthFilter = require("../modules/monthFilter");
 const auth = require('../modules/auth');
@@ -44,29 +44,27 @@ basics.get("/getcookie", auth, async(req, res)=>{
 
 basics.get("/", auth,  async (request, response)=>{
     response.header("Access-Control-Allow-Origin", "*");
-    response.header('Access-Control-Allow-Credentials', true)
+    response.header('Access-Control-Allow-Credentials', true);
+
     const { mes } = request.query;
     //console.log("mes", mes);
     
     /**get data from table*/
     
-    console.log("USERID",request.session.userId)
+    console.log("USERID",config.userId)
      pool.getConnection(async (err, connection) => {
         if(err) throw err;
         
-        let queryDespesasFixas = `SELECT * FROM eco_data WHERE id_despesa = 1 and user_id = ${request.session.userId}`;
+        let queryDespesasFixas = `SELECT * FROM eco_data WHERE id_despesa = 1 and user_id = ${config.userId}`;
 
         connection.query(queryDespesasFixas, (error, result)=> {
             if (error) throw error;
             
             data.despesasFixas = result;
             
-            // console.log("DESPESAS FIXAS", data);
-            //db.destroy();
-            
         });
 
-        let queryDespesasVariaveis = `SELECT * FROM eco_data WHERE id_despesa = 2 and user_id = ${request.session.userId}`;
+        let queryDespesasVariaveis = `SELECT * FROM eco_data WHERE id_despesa = 2 and user_id = ${config.userId}`;
 
         connection.query(queryDespesasVariaveis, (error, result)=> {
             if (error) throw error;
@@ -78,7 +76,7 @@ basics.get("/", auth,  async (request, response)=>{
         
         });
 
-         let queryEntradas = `SELECT * FROM eco_data WHERE id_despesa = 3 and user_id = ${request.session.userId}`;
+         let queryEntradas = `SELECT * FROM eco_data WHERE id_despesa = 3 and user_id = ${config.userId}`;
 
          connection.query(queryEntradas, (error, result)=> {
             if (error) throw error;
@@ -134,7 +132,7 @@ basics.post("/", auth, (request, response) =>{
         id:parseInt(Math.random() * 1000),
         tipo_despesa: tipoDespesa[bloco].nome,
         id_despesa: tipoDespesa[bloco].id,
-        user_id:request.session.userId
+        user_id:config.userId
     }
 
 
@@ -169,7 +167,7 @@ basics.put("/:id", (request, response)=>{
     pool.getConnection((err, connection) => {
         if(err) throw err;
         
-        let updateQuery = `UPDATE eco_data SET nome = '${nome}', valor = '${valor}', mes='${mes}' WHERE user_id = '${request.session.userId}' and id = '${id}'`;
+        let updateQuery = `UPDATE eco_data SET nome = '${nome}', valor = '${valor}', mes='${mes}' WHERE user_id = '${config.userId}' and id = '${id}'`;
 
         connection.query(updateQuery, (error, result)=> {
             if (error) throw error;
@@ -207,7 +205,7 @@ basics.delete("/:id", auth, (request, response)=>{
     pool.getConnection((err, connection) => {
         if(err) throw err;
         
-        let deleteitem = `DELETE FROM eco_data WHERE user_id = ${request.session.userId} and id = ${id}`;
+        let deleteitem = `DELETE FROM eco_data WHERE user_id = ${config.userId} and id = ${id}`;
 
         connection.query(deleteitem, (error, result)=> {
             if (error) throw error;
