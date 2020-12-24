@@ -19,6 +19,7 @@ const pool = mysql.createPool({
 var data = {};
 
 
+
 const tipoDespesa={
     despesasFixas: {
         nome:"despesa_fixa",

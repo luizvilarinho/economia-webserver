@@ -7,6 +7,7 @@ var environment = 'prod';
 
 var SECRET = "mysecret";
 
+
 function auth(req, res, next){
     const authResponse = {};
     const token = req.headers['x-access-token'];

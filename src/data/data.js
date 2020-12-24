@@ -12,6 +12,7 @@ const pool = mysql.createPool({
 var data = {};
 var user_id = 1;
 
+
 pool.getConnection((err, connection) => {
     if(err) throw err;
     
