@@ -1,5 +1,6 @@
 const express = require("express");
 const login = express.Router();
+const auth = require('../modules/auth');
 
 const config = require('../config');
 const jwt = require("jsonwebtoken");
@@ -103,14 +104,15 @@ login.get("/users", (request, response)=>{
         })
 })
 
-login.get("/users/getuserbyid/:id", (request, response)=>{
-    const  id = request.params.id
+login.get("/users/getlogueduser", auth, (request, response)=>{
+    response.header("Access-Control-Allow-Origin", "*");
+    response.header('Access-Control-Allow-Credentials', true);
     var responseObj = {};
 
     pool.getConnection((err, connection) => {
         if(err) throw err;
         
-        let query = `SELECT * FROM users WHERE id = '${id}'`;
+        let query = `SELECT * FROM users WHERE id = '${config.userId}'`;
 
         connection.query(query, (error, result)=> {
              if (error) throw error;
@@ -121,10 +123,14 @@ login.get("/users/getuserbyid/:id", (request, response)=>{
                 responseObj.message = "user not found";
                 response.json(responseObj);
              }else{
-                connection.release();
-                response.json(result[0]);
+                
+                responseObj.success = true;
+                responseObj.message = "user founded";
+                responseObj.userName = result[0].name;
+                responseObj.userEmail = result[0].email;
+                response.json(responseObj);
              }
-                         
+             connection.release();  
             
         });
 
