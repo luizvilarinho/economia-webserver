@@ -83,7 +83,7 @@ login.post("/user/login", (request, response) =>{
     })
 })
 
-login.get("/users", (request, response)=>{
+/*login.get("/users", (request, response)=>{
 
     pool.getConnection((err, connection) => {
             if(err) throw err;
@@ -103,6 +103,7 @@ login.get("/users", (request, response)=>{
 
         })
 })
+*/
 
 
 login.get("/users/getlogueduser", auth, (request, response)=>{

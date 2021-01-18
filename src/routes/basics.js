@@ -35,14 +35,6 @@ const tipoDespesa={
     }
 }
 
-basics.get("/getcookie", auth, async(req, res)=>{
-    var responseObj = {
-        cookies:req.cookies,
-        userID:user_id
-    }
-    res.json(responseObj);
-})
-
 basics.get("/", auth,  async (request, response)=>{
     response.header("Access-Control-Allow-Origin", "*");
     response.header('Access-Control-Allow-Credentials', true);
@@ -52,7 +44,6 @@ basics.get("/", auth,  async (request, response)=>{
     
     /**get data from table*/
     
-    console.log("USERID",config.userId)
      pool.getConnection(async (err, connection) => {
         if(err) throw err;
         

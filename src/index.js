@@ -16,15 +16,11 @@ const pool = mysql.createPool({
 const basics = require("./routes/basics");
 const login = require("./routes/login");
 const cors = require("cors");
-const bodyParser = require("body-parser");
 
 //app.use(cookieParser())
 app.use(cors());
 
 app.use(express.json());
-
-
-app.use(bodyParser.json());
 
 app.use("/api/eco/v1/data", basics);
 app.use("/api/eco/v1/login", login);
