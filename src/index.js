@@ -35,6 +35,6 @@ app.use(function(req, res, next) {
 
 const port = process.env.PORT || 2500;
 
-app.listen(port, ()=>[
+app.listen(port, ()=>{
     console.log(`app is working, on port ${port}...`)
-])
+})

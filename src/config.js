@@ -1,7 +1,7 @@
 
 var config = {
     dev:{
-        urlLogin: "http://192.168.64.12:8888/"
+        urlLogin: "eco-login.html"
     },
     prod:{
         urlLogin:"https://luizvilarinho.com.br/login"
