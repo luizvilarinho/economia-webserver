@@ -19,22 +19,18 @@ function auth(req, res, next){
     if(!token){
         authResponse.message = 'access denied. No token provided.';
         authResponse.redirect = config[environment].urlLogin;
-        res.json(authResponse);
+        console.log("erro");
+        res.status(400).json(authResponse);
     } 
 
-    try{
+    if(token){
         console.log("sucesso");
         config.userId = jwt.verify(token, SECRET).id;
         console.log("config", config);
 
         next();
     }
-    catch(ex){
-        authResponse.message = "Invalid token";
-        console.log("erro");
-        authResponse.redirect = config[environment].urlLogin;
-        res.status(400).json(authResponse);
-    }
+    
 }
 
 module.exports = auth;
