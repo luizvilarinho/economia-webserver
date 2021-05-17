@@ -2,9 +2,8 @@ const express = require("express");
 const basics = express.Router();
 
 const config = require('../config');
-const somarValores = require("../modules/somarValores");
-const monthFilter = require("../modules/monthFilter");
 const auth = require('../modules/auth');
+var uniqid = require('uniqid');
 
 const mysql = require("mysql");
 
@@ -39,71 +38,104 @@ basics.get("/", auth,  async (request, response)=>{
     response.header("Access-Control-Allow-Origin", "*");
     response.header('Access-Control-Allow-Credentials', true);
 
-    const { mes } = request.query;
-    //console.log("mes", mes);
-    
+    const { mes, ano } = request.query;
+
     /**get data from table*/
     
-     pool.getConnection(async (err, connection) => {
+    if(mes){
+       var queryMes = `and mes = ${mes}`
+    }else{
+        var queryMes = ""
+    }
+
+    data = {};
+    pool.getConnection(async (err, connection) => {
         if(err) throw err;
         
-        let queryDespesasFixas = `SELECT * FROM eco_data WHERE id_despesa = 1 and user_id = ${config.userId}`;
+        let queryDespesas = `SELECT * FROM eco_data WHERE user_id = ${config.userId} and ano=${ano}`;
 
-        connection.query(queryDespesasFixas, (error, result)=> {
+        connection.query(queryDespesas, async (error, result)=> {
             if (error) throw error;
             
-            data.despesasFixas = result;
-            
-        });
+            data.despesasFixas = await result.filter(despesa=>{
+                return despesa.id_despesa == 1 && despesa.mes == mes
+            })
 
-        let queryDespesasVariaveis = `SELECT * FROM eco_data WHERE id_despesa = 2 and user_id = ${config.userId}`;
+            console.log("data.despesasFixas", data.despesasFixas)
+            if(data.despesasFixas.length === 0){
+                var maiorMes = 1;
+                result.map(despesa=>{
+                    if(despesa.mes > maiorMes){
+                        maiorMes = despesa.mes
+                    }
+                })
 
-        connection.query(queryDespesasVariaveis, (error, result)=> {
-            if (error) throw error;
-            
-            data.despesasVariaveis = result;
-            
-            //console.log("DESPESAS Variaveis", data);
-            //db.destroy();
-        
-        });
+                var ultimaDespesaFixa = result.filter(despesa=>{
+                    return despesa.id_despesa == 1 && despesa.mes == maiorMes
+                })
 
-         let queryEntradas = `SELECT * FROM eco_data WHERE id_despesa = 3 and user_id = ${config.userId}`;
+                
+                for(let i = 0; i < ultimaDespesaFixa.length; i++){
+                    data.despesasFixas.push(ultimaDespesaFixa[i])
+                    ultimaDespesaFixa[i].mes = mes;
 
-         connection.query(queryEntradas, (error, result)=> {
-            if (error) throw error;
-            
-            data.entradas = result;
-            
-            if(mes){
-                let dataReturn= monthFilter(mes);
-        
-                //console.log("dataReturn", dataReturn)
-        
-                let consolidado = somarValores(dataReturn);
-                dataReturn.consolidado = consolidado;
-        
-                dataReturn.success = true;
-                dataReturn.message = "successful filter";
-                response.json(dataReturn);
-        
-                return
+                    var uniqId = uniqid();
+                    var includeObj = {
+                        nome: ultimaDespesaFixa[i].nome,
+                        valor: ultimaDespesaFixa[i].valor,
+                        mes,
+                        id: uniqId,
+                        tipo_despesa: 'despesa_fixa',
+                        id_despesa: 1,
+                        user_id:config.userId
+                    }
+
+                    console.log("includeObj", includeObj)
+                    let createItem = `INSERT INTO eco_data (nome, valor, mes, id, tipo_despesa, id_despesa, user_id) VALUES ('${includeObj.nome}', '${includeObj.valor}', '${includeObj.mes}', '${includeObj.id}', '${includeObj.tipo_despesa}', '${includeObj.id_despesa}', '${includeObj.user_id}')`;
+
+                    connection.query(createItem, (error, ultimaDespesa)=> {
+                        if(error) console.log(error)
+                        
+                        console.log("ultimaDespesa", ultimaDespesa)
+                    })
+                }
             }
             
-        
-            data.success = true;
-            data.message = "successful request";
-            response.json(data)
-            //db.destroy();
-        });
+            data.despesasVariaveis= result.filter(despesa=>{
+                return despesa.id_despesa == 2 && despesa.mes == mes
+            })
 
-        connection.release();
+            data.entradas = result.filter(entrada=>{
+                return entrada.id_despesa == 3 && entrada.mes == mes
+            })
+            
 
-    })
+            connection.release();
+
+           response.json(data)
+
+         })
         /*get data from table*/
-    
+    })
+})
 
-    
+basics.get("/dominio/ano", auth, async(req, res)=>{
+    pool.getConnection(async (err, connection) => {
+
+        let queryAnos = `SELECT DISTINCT ano FROM eco_data WHERE user_id = ${config.userId}`;
+
+        connection.query(queryAnos, async (error, anos)=> {
+            if(error) console.log(error)
+
+            let anosList = anos
+                .map(ano=>{
+                     return ano.ano
+                })
+                .sort((a,b)=> {return b-a})
+            
+                res.json(anosList)
+        })
+    })
 })
 
 basics.get("/:bloco", (request, response)=>{
@@ -115,25 +147,26 @@ basics.get("/:bloco", (request, response)=>{
 })
 
 basics.post("/", auth, (request, response) =>{
-    let { bloco, nome, valor, mes } = request.body;
+    let { bloco, nome, valor, mes, ano } = request.body;
 
+    var uniqId = uniqid();
     var includeObj = {
         nome,
         valor,
         mes,
-        id:parseInt(Math.random() * 1000),
+        ano,
+        id: uniqId,
         tipo_despesa: tipoDespesa[bloco].nome,
         id_despesa: tipoDespesa[bloco].id,
         user_id:config.userId
     }
-
 
    // data[bloco].push(includeObj);
 
    pool.getConnection((err, connection) => {
         if(err) throw err;
         
-        let createItem = `INSERT INTO eco_data (nome, valor, mes, id, tipo_despesa, id_despesa, user_id) VALUES ('${includeObj.nome}', '${includeObj.valor}', '${includeObj.mes}', '${includeObj.id}', '${includeObj.tipo_despesa}', '${includeObj.id_despesa}', '${includeObj.user_id}')`;
+        let createItem = `INSERT INTO eco_data (nome, valor, mes, ano, id, tipo_despesa, id_despesa, user_id) VALUES ('${includeObj.nome}', '${includeObj.valor}', '${includeObj.mes}', '${includeObj.ano}', '${includeObj.id}', '${includeObj.tipo_despesa}', '${includeObj.id_despesa}', '${includeObj.user_id}')`;
 
         connection.query(createItem, (error, result)=> {
             if (error) throw error;
@@ -152,14 +185,14 @@ basics.post("/", auth, (request, response) =>{
 })
 
 basics.put("/:id", (request, response)=>{
-    const { nome, valor, mes } = request.body;
+    const { nome, valor, mes, ano } = request.body;
     const { id } = request.params;
     var responseObj = {};
 
     pool.getConnection((err, connection) => {
         if(err) throw err;
         
-        let updateQuery = `UPDATE eco_data SET nome = '${nome}', valor = '${valor}', mes='${mes}' WHERE user_id = '${config.userId}' and id = '${id}'`;
+        let updateQuery = `UPDATE eco_data SET nome = '${nome}', valor = '${valor}', mes='${mes}' and ano=${ano} WHERE user_id = '${config.userId}' and id = '${id}'`;
 
         connection.query(updateQuery, (error, result)=> {
             if (error) throw error;
@@ -197,12 +230,11 @@ basics.delete("/:id", auth, (request, response)=>{
     pool.getConnection((err, connection) => {
         if(err) throw err;
         
-        let deleteitem = `DELETE FROM eco_data WHERE user_id = ${config.userId} and id = ${id}`;
+        let deleteitem = `DELETE FROM eco_data WHERE user_id = ${config.userId} and id = '${id}'`;
 
         connection.query(deleteitem, (error, result)=> {
             if (error) throw error;
             
-            //console.log("result", result)
             responseObj.success = true;
             responseObj.message = "item successful deleted";
 

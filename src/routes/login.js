@@ -70,7 +70,7 @@ login.post("/user/login", (request, response) =>{
                 response.json(objRespopnse) 
             }else{
                 objRespopnse = {
-                    success : true,
+                    success : false,
                     findUser: true,
                     correctPassword: false,
                     message:"Senha incorreta"

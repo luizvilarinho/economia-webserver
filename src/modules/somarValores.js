@@ -1,5 +1,3 @@
-const express = require("express");
-const data = require("../data/data");
 
 function somarValores(obj){
 
