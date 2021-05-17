@@ -35,8 +35,6 @@ const tipoDespesa={
 }
 
 basics.get("/", auth,  async (request, response)=>{
-    response.header("Access-Control-Allow-Origin", "*");
-    response.header('Access-Control-Allow-Credentials', true);
 
     const { mes, ano } = request.query;
 
@@ -222,8 +220,6 @@ basics.put("/:id", (request, response)=>{
     });
 
 basics.delete("/:id", auth, (request, response)=>{
-    response.header("Access-Control-Allow-Origin", "*");
-    response.header('Access-Control-Allow-Credentials', true)
 
     const { id } = request.params;
     var responseObj = {};

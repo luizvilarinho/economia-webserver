@@ -7,9 +7,6 @@ var SECRET = "mysecret";
 
 
 function auth(req, res, next){
-    response.header("Access-Control-Allow-Origin", "*");
-    response.header('Access-Control-Allow-Credentials', true);
-    
     const authResponse = {};
     const token = req.headers['x-access-token'];
     config.token = token;
