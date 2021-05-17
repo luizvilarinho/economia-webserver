@@ -107,8 +107,7 @@ login.post("/user/login", (request, response) =>{
 
 
 login.get("/users/getlogueduser", auth, (request, response)=>{
-    response.header("Access-Control-Allow-Origin", "*");
-    response.header('Access-Control-Allow-Credentials', true);
+   
     var responseObj = {};
 
     pool.getConnection((err, connection) => {
