@@ -16,7 +16,7 @@ function auth(req, res, next){
 
     if(!token){
         console.log("teste 1")
-        authResponse.message = 'access denied. No token provided.';
+        authResponse.message = 'access denied. No token provided2.';
         authResponse.redirect = config[environment].urlLogin;
         //console.log("erro");
         res.status(400).json(authResponse);
