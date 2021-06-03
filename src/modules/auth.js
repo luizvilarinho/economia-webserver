@@ -1,7 +1,7 @@
 const config = require('../config');
 const jwt = require("jsonwebtoken");
 
-var environment = 'prod';
+var environment = 'dev';
 
 var SECRET = "mysecret";
 
