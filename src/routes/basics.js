@@ -6,6 +6,7 @@ const auth = require('../modules/auth');
 var uniqid = require('uniqid');
 
 const mysql = require("mysql");
+// const util = require('util');
 
 const pool = mysql.createPool({
     host     : 'sql399.main-hosting.eu',
@@ -40,80 +41,153 @@ basics.get("/", auth,  async (request, response)=>{
 
     /**get data from table*/
     
-    if(mes){
-       var queryMes = `and mes = ${mes}`
+    if(mes && ano){
+       var queryMes = `and mes = ${mes} and ano = ${ano}`
     }else{
-        var queryMes = ""
+        let dataAtual = new Date();
+        let mesAtual = dataAtual.getMonth();
+        let anoATual = dataAtual.getFullYear();
+        var queryMes = `and mes = ${mesAtual} and ano = ${anoATual}`
     }
 
     data = {};
     pool.getConnection(async (err, connection) => {
         if(err) throw err;
         
-        let queryDespesas = `SELECT * FROM eco_data WHERE user_id = ${config.userId} and ano=${ano}`;
+        // let queryDespesas = `SELECT * FROM eco_data WHERE user_id = ${config.userId} ${queryMes}`;
+        // console.log("exec-query", queryDespesas);
 
-        connection.query(queryDespesas, async (error, result)=> {
-            if (error) throw error;
+        let queryDespesas = 
+        `SELECT * FROM eco_data 
+            WHERE user_id=${config.userId} AND
+            (id_despesa=1 ${queryMes}) OR
+            (id_despesa=2 ${queryMes}) OR
+            (id_despesa=3 ${queryMes})`
             
-            data.despesasFixas = await result.filter(despesa=>{
-                return despesa.id_despesa == 1 && despesa.mes == mes
-            })
-
-            console.log("data.despesasFixas", data.despesasFixas)
-            if(data.despesasFixas.length === 0){
-                var maiorMes = 1;
-                result.map(despesa=>{
-                    if(despesa.mes > maiorMes){
-                        maiorMes = despesa.mes
-                    }
-                })
-
-                var ultimaDespesaFixa = result.filter(despesa=>{
-                    return despesa.id_despesa == 1 && despesa.mes == maiorMes
-                })
-
+           try{
+            connection.query(queryDespesas, async (error, result)=> {
                 
-                for(let i = 0; i < ultimaDespesaFixa.length; i++){
-                    data.despesasFixas.push(ultimaDespesaFixa[i])
-                    ultimaDespesaFixa[i].mes = mes;
+                if(error) console.log(error);
 
-                    var uniqId = uniqid();
-                    var includeObj = {
-                        nome: ultimaDespesaFixa[i].nome,
-                        valor: ultimaDespesaFixa[i].valor,
-                        mes,
-                        id: uniqId,
-                        tipo_despesa: 'despesa_fixa',
-                        id_despesa: 1,
-                        user_id:config.userId
+
+                let formatter={
+                    ano: ano || anoATual,
+                    mes: mes || mesAtual,
+                    despesasFixas:[],
+                    despesasVariaveis: [],
+                    entradas:[]
+                };
+
+                result.map(despesa=>{
+                    let obj = {
+                        nome: despesa.nome,
+                        valor: despesa.valor,
+                        tipo_despesa:despesa.tipo_despesa,
+                        id:despesa.id
                     }
+                    if(despesa.id_despesa === 1){
+                        formatter.despesasFixas.push(obj);
+                    }
+                    if(despesa.id_despesa === 2){
+                        formatter.despesasVariaveis.push(obj);
+                    }
+                    if(despesa.id_despesa === 3){
+                        formatter.entradas.push(obj);
+                    }
+                })
 
-                    console.log("includeObj", includeObj)
-                    let createItem = `INSERT INTO eco_data (nome, valor, mes, id, tipo_despesa, id_despesa, user_id) VALUES ('${includeObj.nome}', '${includeObj.valor}', '${includeObj.mes}', '${includeObj.id}', '${includeObj.tipo_despesa}', '${includeObj.id_despesa}', '${includeObj.user_id}')`;
+                //verifica despesasFixas
+                if(formatter.despesasFixas.length === 0){
+                   
+                    let queryDespesasFixasDoAno = ` SELECT * FROM  eco_data WHERE user_id=${config.userId} AND id_despesa=1 AND ano = ${ano || anoAtual}`;
 
-                    connection.query(createItem, (error, ultimaDespesa)=> {
-                        if(error) console.log(error)
+                    connection.query(queryDespesasFixasDoAno, (error, result)=>{
+                        let mesPesquisado = mes || mesAtual;
+
                         
-                        console.log("ultimaDespesa", ultimaDespesa)
+                        if(mesPesquisado > 1){
+                            
+                            for(let i = mesPesquisado -1; i > 0; i--){
+                                let filtro = result.filter(despesa=>{return despesa.mes === i && despesa.id_despesa === 1})
+                                if(filtro.length > 0){
+
+                                    //gravar no banco 
+                                    filtro.map(desp=>{
+                                        console.log("desp", desp)
+                                        var uniqId = uniqid();
+                                        let insertQuery = `INSERT INTO eco_data 
+                                            (ano, id, id_despesa, mes, nome, tipo_despesa, user_id, valor) VALUES
+                                            (${ano || anoAtual}, '${uniqId}', 1, ${mes || mesAtual},'${desp.nome}', 'despesa_fixa', ${config.userId}, ${desp.valor})`;
+
+                                            console.log("insertQuery",insertQuery)
+                                            connection.query(insertQuery, (error, result)=>{
+                                                if(error) console.log(error)
+
+                                                console.log("INSERT", result)
+                                            })
+                                        
+                                    })
+                                    
+                                    connection.query(queryDespesas, (error, result)=>{
+                                        if(error) console.log(error)
+
+                                        let formatter={
+                                            ano: ano || anoATual,
+                                            mes: mes || mesAtual,
+                                            despesasFixas:[],
+                                            despesasVariaveis: [],
+                                            entradas:[]
+                                        };
+                        
+                                        result.map(despesa=>{
+                                            let obj = {
+                                                nome: despesa.nome,
+                                                valor: despesa.valor,
+                                                tipo_despesa:despesa.tipo_despesa,
+                                                id:despesa.id
+                                            }
+                                            if(despesa.id_despesa === 1){
+                                                formatter.despesasFixas.push(obj);
+                                            }
+                                            if(despesa.id_despesa === 2){
+                                                formatter.despesasVariaveis.push(obj);
+                                            }
+                                            if(despesa.id_despesa === 3){
+                                                formatter.entradas.push(obj);
+                                            }
+                                        })
+                                        
+                                        console.log("FORMMATTTER", formatter)
+                                        response.json(formatter);
+
+                                    })
+                                    return
+                                }
+
+                                if(mesPesquisado === 1){
+                                    response.json([])
+                                    return
+                                }
+                                
+                            }
+
+                           
+                        }
+
                     })
+                }else{
+                    response.json(formatter) ;
                 }
-            }
-            
-            data.despesasVariaveis= result.filter(despesa=>{
-                return despesa.id_despesa == 2 && despesa.mes == mes
+
+
+               
             })
+           }catch(error){
+               console.log(error)
+           }
 
-            data.entradas = result.filter(entrada=>{
-                return entrada.id_despesa == 3 && entrada.mes == mes
-            })
-            
 
-            connection.release();
-
-           response.json(data)
-
-         })
-        /*get data from table*/
+        
     })
 })
 

@@ -1,7 +1,7 @@
 const config = require('../config');
 const jwt = require("jsonwebtoken");
 
-var environment = 'dev';
+var environment = 'prod';
 
 var SECRET = "mysecret";
 
@@ -10,7 +10,7 @@ function auth(req, res, next){
     const authResponse = {};
     const token = req.headers['x-access-token'];
     config.token = token;
-    //console.log("token", token);
+    console.log("token", token);
 
    
 
@@ -32,7 +32,9 @@ function auth(req, res, next){
                 res.status(400).json(authResponse);
                 return
             }else{
+                console.log("SUCCSESSTOKEN")
                 config.userId = jwt.verify(token, SECRET).id;
+                console.log("SUCCSESSTOKEN2", config)
             } 
 
         })
