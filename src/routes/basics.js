@@ -53,9 +53,6 @@ basics.get("/", auth,  async (request, response)=>{
     data = {};
     pool.getConnection(async (err, connection) => {
         if(err) throw err;
-        
-        // let queryDespesas = `SELECT * FROM eco_data WHERE user_id = ${config.userId} ${queryMes}`;
-        // console.log("exec-query", queryDespesas);
 
         let queryDespesas = 
         `SELECT * FROM eco_data 
@@ -281,17 +278,10 @@ basics.put("/:id", (request, response)=>{
         connection.release();
     })
 
-    
-/** if(isChanged == false){
-        let responseObj = {
-            success:false,
-            message:"not find itens with the given id"
-        }
-        return response.json(responseObj);
-    } */
+
     
 
-    });
+});
 
 basics.delete("/:id", auth, (request, response)=>{
 
@@ -314,16 +304,6 @@ basics.delete("/:id", auth, (request, response)=>{
 
         connection.release();
     })
-    /*
-    let df = data.despesasFixas.filter(el=>el.id != id);
-    let dv = data.despesasVariaveis.filter(el=>el.id != id);
-    let e = data.entradas.filter(el=>el.id != id);
-    
-    data.despesasFixas = df;
-    data.despesasVariaveis = dv;
-    data.entradas = e;
-
-    */
 })
 
 

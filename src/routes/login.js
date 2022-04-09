@@ -6,6 +6,8 @@ const config = require('../config');
 const jwt = require("jsonwebtoken");
 
 const mysql = require("mysql");
+const nodemailer = require('nodemailer');
+const templateEmail = require('../modules/emailTemplate');
 
 const pool = mysql.createPool({
     host     : 'sql399.main-hosting.eu',
@@ -16,6 +18,25 @@ const pool = mysql.createPool({
 });
 
 var SECRET = "mysecret";
+
+//email configuration
+const transporter = nodemailer.createTransport({
+    host: "smtp.hostinger.com",
+    port: 465,
+    secure: true, // true for 465, false for other ports
+    auth: {
+        user: "contato@luizvilarinho.com.br",
+        pass: "Batata.33"
+    },
+    tls: { rejectUnauthorized: false }
+  });
+
+const mailOptions = {
+    from: 'contato@luizvilarinho.com.br',
+    to: '',
+    subject: 'recuperação de senha appdespesas',
+    html: ''
+};
 
 
 login.post("/user/login", (request, response) =>{
@@ -143,7 +164,6 @@ login.get("/users/getlogueduser", auth, (request, response)=>{
 login.post("/user/create", (request, response)=>{
     const { name, email, password  } = request.body;
     
-    var responseObj={};
 
     pool.getConnection((err, connection) => {
         if(err) throw err;
@@ -190,6 +210,7 @@ login.delete("/user/delete/:id", (req, response)=>{
     pool.getConnection((err, connection)=>{
         if (err) throw error;
         let findUserQuery = `DELETE FROM users WHERE id = '${id}'`;
+        
         connection.query(findUserQuery, (err, user)=>{
             if (err) throw error;
 
@@ -197,6 +218,86 @@ login.delete("/user/delete/:id", (req, response)=>{
             responseObj.success = true;
             responseObj.message = "user deleted"
             response.json(responseObj);
+        })
+    })
+})
+
+login.post("/user/sendemail", (request, response)=>{
+    let { email } = request.body;
+
+    //localizar dados do usuario
+    pool.getConnection((err, connection)=>{
+        if(err) throw err;
+
+        let findUserByEmailQuery = `SELECT name, email FROM users WHERE email = '${email}'`;
+
+        connection.query(findUserByEmailQuery, (err, user)=>{
+            if(err) throw err;
+
+            if(user){
+
+                //enviar email com o link para troca de senha           
+                mailOptions.to = email;
+                mailOptions.html = templateEmail(user[0].name, user[0].email);
+                transporter.sendMail(mailOptions, function(error, info){
+                    if (error) response.json({error})
+                      
+                        console.log('Email enviado: ' + info.envelope);
+                        response.json({
+                            success:true,
+                            message:"email enviado com sucesso"
+                        })
+                  });
+
+                
+            }else{
+                response.json({message:"user not found", success:false})
+            }
+        })
+    })
+    
+
+    
+});
+
+//todo
+login.put("/user/changepassword", (request, response)=>{
+    
+    let { novaSenha, tokenUrl } = request.body;
+    let email = Buffer.from(tokenUrl, 'hex').toString('utf8');
+
+    if(!novaSenha){
+        response.json({success:false, message: "O usuário edve informara nova senha"})
+    }
+
+    //localizar usuario e alterar senha antiga pela nova senha
+
+    pool.getConnection((err, connection)=>{
+        if(err) throw err;
+
+        let findUserByEmailQuery = `SELECT name, email FROM users WHERE email = '${email}'`;
+
+        connection.query(findUserByEmailQuery, (err, user)=>{
+            if(err) throw err;
+
+            console.log("USER", user)
+            if(user){
+
+                console.log("SENHA", novaSenha, "EMAIL", email)
+                let updateQuery = `UPDATE users SET password = ${novaSenha} WHERE email = '${email}'`
+                
+                connection.query(updateQuery,(err, resp)=>{
+                    if(err) console.log(err)
+
+                    response.json({
+                        success:true,
+                        message:"senha alterada com sucesso"
+                    })
+                })
+                
+            }else{
+                response.json({message:"user not found", success:false})
+            }
         })
     })
 })
