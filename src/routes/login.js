@@ -240,9 +240,9 @@ login.post("/user/sendemail", (request, response)=>{
                 mailOptions.to = email;
                 mailOptions.html = templateEmail(user[0].name, user[0].email);
                 transporter.sendMail(mailOptions, function(error, info){
-                    if (error) response.json({error})
+                    
+                    if (error) console.log(error)
                       
-                        console.log('Email enviado: ' + info.envelope);
                         response.json({
                             success:true,
                             message:"email enviado com sucesso"
@@ -264,7 +264,9 @@ login.post("/user/sendemail", (request, response)=>{
 login.put("/user/changepassword", (request, response)=>{
     
     let { novaSenha, tokenUrl } = request.body;
-    let email = Buffer.from(tokenUrl, 'hex').toString('utf8');
+    let email = Buffer.from(tokenUrl, 'hex').toString('utf8').replace("=", "").trim();
+
+    console.log("CHANGESENHA",novaSenha, tokenUrl, email)
 
     if(!novaSenha){
         response.json({success:false, message: "O usuário edve informara nova senha"})

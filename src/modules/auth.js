@@ -15,9 +15,8 @@ function auth(req, res, next){
    
 
     if(!token){
-        console.log("teste 1")
         authResponse.message = 'access denied. No token provided2.';
-        authResponse.redirect = config[environment].urlLogin;
+        authResponse.redirect = process.env.URL_LOGIN;
         //console.log("erro");
         res.status(400).json(authResponse);
     } 
@@ -28,13 +27,12 @@ function auth(req, res, next){
             if(err){
                 console.log("ERRO!", err)
                 authResponse.message = 'err.message';
-                authResponse.redirect = config[environment].urlLogin;
+                authResponse.redirect = process.env.URL_LOGIN;
                 res.status(400).json(authResponse);
                 return
             }else{
                 console.log("SUCCSESSTOKEN")
                 config.userId = jwt.verify(token, SECRET).id;
-                console.log("SUCCSESSTOKEN2", config)
             } 
 
         })

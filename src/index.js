@@ -1,4 +1,5 @@
 const express = require('express');
+require('dotenv').config();
 const app = express();
 //const cookieParser = require("cookie-parser");
 
@@ -39,5 +40,5 @@ app.use("/api/eco/v1/login", login);
 const port = process.env.PORT || 2500;
 
 app.listen(port, ()=>{
-    console.log(`app is working, on port ${port}...`)
+    console.log(`app is working, in ${process.env.NODE_ENV} mode on port ${port}...`)
 })
