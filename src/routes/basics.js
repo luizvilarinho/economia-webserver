@@ -60,7 +60,8 @@ basics.get("/", auth,  async (request, response)=>{
             (id_despesa=1 ${queryMes}) OR
             (id_despesa=2 ${queryMes}) OR
             (id_despesa=3 ${queryMes})`
-            
+        
+        console.log("QUERY", queryDespesas)
            try{
             connection.query(queryDespesas, async (error, result)=> {
                 
@@ -75,6 +76,7 @@ basics.get("/", auth,  async (request, response)=>{
                     entradas:[]
                 };
 
+                console.log("RESULT", result)
                 result.map(despesa=>{
                     let obj = {
                         nome: despesa.nome,
